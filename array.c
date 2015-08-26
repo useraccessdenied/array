@@ -1,8 +1,7 @@
-#include<stdio.h>
-#include<stdlib.h>
+#include<ncurses.h>
 #define SIZE 100
 
-int length_of_no(int n){				//Finds length of a no.
+int length_of_no(int n){
 	int i=0,t=0;
 	if(n<0) t=1;
 	do{
@@ -12,59 +11,57 @@ int length_of_no(int n){				//Finds length of a no.
 	return i+t;
 }
 
-int length(int *a){						//Finds length of an array
+void display(int *a){
+	int i,j,l=length(a),l_no;
+	//printw("The Given array is :\n\n");
+	printw("\n");
+	if(l){
+		for(i=0;i<l;i++){
+			printw(" ");
+			l_no=length_of_no(a[i]);
+			for(j=0;j<l_no+2;j++){
+				printw("_");
+			}
+		}
+		printw("\n");
+		for(i=0;i<l;i++){
+			printw("|");
+			l_no=length_of_no(a[i]);
+			for(j=0;j<l_no+2;j++){
+				printw(" ");
+			}
+		}
+		printw("|\n");
+		for(i=0;i<l;i++){
+			printw("| %d ",a[i]);
+		}
+		printw("|\n");
+		for(i=0;i<l;i++){
+			printw("|");
+			l_no=length_of_no(a[i]);
+			for(j=0;j<l_no+2;j++){
+				printw("_");
+			}
+		}
+		printw("|\n");
+	}
+}
+int length(int *a){
 	int i=0;
 	while(a[i]!='\0'){
 		i++;
 	}
 	return i;
 }
-
-void display(int *a){					//Displays the array
-	int i,j,l=length(a),l_no;
-	//printf("The Given array is :\n\n");
-	printf("\n");
-	if(l){
-		for(i=0;i<l;i++){
-			printf(" ");
-			l_no=length_of_no(a[i]);
-			for(j=0;j<l_no+2;j++){
-				printf("_");
-			}
-		}
-		printf("\n");
-		for(i=0;i<l;i++){
-			printf("|");
-			l_no=length_of_no(a[i]);
-			for(j=0;j<l_no+2;j++){
-				printf(" ");
-			}
-		}
-		printf("|\n");
-		for(i=0;i<l;i++){
-			printf("| %d ",a[i]);
-		}
-		printf("|\n");
-		for(i=0;i<l;i++){
-			printf("|");
-			l_no=length_of_no(a[i]);
-			for(j=0;j<l_no+2;j++){
-				printf("_");
-			}
-		}
-		printf("|\n");
-	}
-}
-
-void get_array(int *a, int s){			//Initializes an array
+void get_array(int *a, int s){
 	int i;
-	printf("Start Typing the array :\n");
+	printw("Start Typing the array :\n");
+	refresh();
 	for(i=0;i<s;i++){
-		scanf("%d",&a[i]);
+		scanw("%d",&a[i]);
 	}
 }
-
-void insert(int *a, int pos, int data){	//Insert an element in array
+void insert(int *a, int pos, int data){
 	int l;
 	l=length(a);
 	for(;pos-1!=l;l--){
@@ -72,89 +69,111 @@ void insert(int *a, int pos, int data){	//Insert an element in array
 	}
 	a[pos-1]=data;
 }
-
-void delete(int *a, int pos){			//Delete an element from array
+void delete(int *a, int pos){
 	int l=length(a);
 	while(pos<=l){
 		a[pos-1]=a[pos];
 		pos++;
 	}
 }
-
-void search(int *a, int data){			//Search an element in array
+void search(int *a, int data){
 	int i,f=0,l=length(a);
 	for (i=0;i<l;i++){
 		if(a[i]==data){
-			printf("Found at position %d",i+1);
+			printw("Found at position %d",i+1);
 			f=1;
 		}
 	}
-	if(!f) printf("Not Found");
+	if(!f) printw("Not Found");
+	refresh();
 }
-
-void clean(int *a){						//Cleans the array
+void clean(int *a){
 	int i;
 	for(i=0;i<SIZE;i++){
 		a[i]='\0';
 	}
 }
-
-void menu(){							//Print the array menu
-	printf("\nThe Options available are : \n");
-	printf("\t1: Initialize given array.\n");
-	printf("\t2: Insert an element at given pos.\n");
-	printf("\t3: Delete an element at given pos.\n");
-	printf("\t4: Search a specific element.\n");
-	printf("\t5: Length of given array.\n");
-	printf("\t6: Clear the given array.\n");
-	printf("\t9: Quit.\n");
-	printf("\nEnter Option : ");
+void menu(){
+	printw("\nThe Options available are : \n");
+	printw("\tA: Initialize given array.\n");
+	printw("\tI: Insert an element at given pos.\n");
+	printw("\tD: Delete an element at given pos.\n");
+	printw("\tS: Search a specific element.\n");
+	printw("\tP: Print the array.\n");
+	printw("\tL: Length of given array.\n");
+	printw("\tC: Clear the given array.\n");
+	printw("\tQ: Quit.\n");
+	printw("\nEnter Option : ");
 }
-
-void main(){
+int main(){
 	static int a[SIZE];
-	int size,pos,data,opt,display_length=0,display_search=0;
-	
-	while(1){							//Infinite Loop untill pressed 'q'
-		system("clear");
+	int size,pos,data;
+	char opt;
+	initscr();
+	cbreak();
+	while(1){
+		clear();
 		display(a);
-		if(display_length){
-			printf("\nThe length of the given array is %d\n",length(a));
-			display_length=0;
-		}
-		if(display_search){
-			search(a,data);
-			display_search=0;
-		}
 		menu();
-		scanf("%d",&opt);
+		refresh();
+		opt=getch();
 		switch (opt){
-			case 1:	printf("\nEnter Size : ");
-						scanf("%d",&size);
+			case 'a':
+			case 'A':	printw("\nEnter Size : ");
+						refresh();
+						scanw("%d",&size);
 						get_array(a,size);
-						printf("\nCompleted!\n");
+						printw("\nCompleted!\n");
+						refresh();
 						break;
-			case 2:	printf("\nEnter position and data : ");
-						scanf("%d %d",&pos,&data);
+			case 'i':
+			case 'I':	printw("\nEnter position and data : ");
+						refresh();
+						scanw("%d %d",&pos,&data);
 						insert(a,pos,data);
-						printf("\nCompleted!\n");
+						printw("\nCompleted!\n");
+						refresh();
 						break;
-			case 3:	printf("\nEnter position to be deleted : ");
-						scanf("%d",&pos);
+			case 'd':
+			case 'D':	printw("\nEnter position to be deleted : ");
+						refresh();
+						scanw("%d",&pos);
 						delete(a,pos);
-						printf("\nCompleted!\n");
+						printw("\nCompleted!\n");
+						refresh();
 						break;
-			case 4:	printf("\nEnter no. to be searched : ");
-						scanf("%d",&data);
-						display_search=1;
+			case 's':
+			case 'S':	printw("\nEnter no. to be searched : ");
+						refresh();
+						scanw("%d",&data);
+						search(a,data);
+						printw("\nCompleted!\n");
+						refresh();
+						getch();
 						break;
-			case 5:	display_length=1;
+			case 'p':
+			case 'P':	display(a);
+						refresh();
+						getch();
 						break;
-			case 6:	clean(a);
-						printf("\nCompleted!\n");
+			case 'l':
+			case 'L':	printw("\nThe length of the given array is %d\n",length(a));
+						refresh();
+						getch();
 						break;
-			case 9:	system("clear");
-						return;
+			case 'c':
+			case 'C':	clean(a);
+						printw("\nCompleted!\n");
+						refresh();
+						break;
+			case 'q':
+			case 'Q':	endwin();
+						return 0;
+			default	:	printw("\n");
+						refresh();
+						break;
 		}
 	}
+	
+	endwin();
 }

@@ -1,7 +1,7 @@
 CC=gcc
 
-array1: array.c
+array: array.c
 	$(CC) array.c -o array
 
 clean:
-	rm array1
+	rm array
